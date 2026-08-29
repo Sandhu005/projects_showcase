@@ -11,6 +11,7 @@ app.get("/about", (req, res) => {
     res.send("<h2>About Page</h2>");
 });
 
+//starting server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}.`);
 });

@@ -1,0 +1,17 @@
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\UserController;
+
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
+
+Route::apiResource('/categories', CategoryController::class)->except('store');
+Route::middleware('auth:api')->group(function(){
+    Route::post('categories', [CategoryController::class, 'store']);
+});
+Route::post('/user/register', [UserController::class, 'store']);
+Route::post('/user/login', [UserController::class, 'login']);

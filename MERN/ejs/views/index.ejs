@@ -1,0 +1,21 @@
+<%- include("header.ejs") %>
+
+<body>
+
+    <% if(locals.sum){ %>
+        <h1>There are <%= sum %> letters in your name.</h1>
+        <% } else { %>
+            <h1>Enter Your Name Below:</h1>
+            <% } %>
+    <form action="/submit" method="post">
+        <label for="firstName" hidden>First Name</label>
+        <input type="text" name="firstName" placeholder="First Name">
+        <label for="lastName" hidden>Last Name</label>
+        <input type="text" name="lastName" placeholder="Last Name">
+        <input type="submit" value="submit">
+    </form>
+</body>
+
+    <%- include("footer.ejs") %>
+
+</html>

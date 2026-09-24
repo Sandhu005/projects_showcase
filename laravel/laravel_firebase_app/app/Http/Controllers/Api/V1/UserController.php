@@ -50,7 +50,7 @@ class UserController extends Controller
             'phone' => $farmer['phone'] ?? null,
             'email' => $farmer['email'] ?? null,
             'location' => [
-                'name' => $farmer['location']['city'] ?? null,
+                'city' => $farmer['location']['city'] ?? null,
                 'state' => $farmer['location']['state'] ?? null,
                 'lat' => $farmer['location']['lat'] ?? null,
                 'lng' => $farmer['location']['lng'] ?? null,

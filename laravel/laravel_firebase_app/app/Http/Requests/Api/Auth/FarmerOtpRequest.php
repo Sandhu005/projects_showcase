@@ -23,7 +23,7 @@ class FarmerOtpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => ['required', 'string', 'regex:/^\+?[1-9]\d{1,14}$/'],
+            'phone' => ['required', 'string', 'regex:/^[6-9]\d{9}$/'],
         ];
     }
 }

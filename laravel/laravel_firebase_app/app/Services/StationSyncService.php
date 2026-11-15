@@ -7,8 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class StationSyncService
 {
-    private string $stationsUrl =
-        'https://lotusinfotech.co.in/uhfnew/data/stations.json';
+    private string $stationsUrl = 'Your_Station_API_Endpoint_Here'; // Replace with your actual station API endpoint
 
     public function sync(): int
     {

@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Http;
 class WeatherService
 {
     private string $predictionBaseUrl =
-        'https://lotusinfotech.co.in/uhfnew/data/predictions/';
+        'your_weather_api_endpoint_here/'; // Replace with your actual weather API endpoint
 
     private string $gddUrl =
-        'https://lotusinfotech.co.in/uhfnew/data/daily_gdd_data.json';
+        'your_gdd_api_endpoint_here'; // Replace with your actual GDD API endpoint
 
     /**
      * Get weather data for latitude/longitude.

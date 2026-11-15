@@ -18,8 +18,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::patch('/users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
     Route::resource('crops', CropsController::class)->except('index', 'show');
     Route::patch('/crops/{crop}/restore', [CropsController::class, 'restore'])->name('crops.restore');
-    // Route::resource('seeds', SeedsController::class)->except('index', 'show');
-    // Route::patch('/seeds/{seed}/restore', [SeedsController::class, 'restore'])->name('seeds.restore');
     Route::resource('advisories', AdvisoryController::class)->except('index', 'show');
     Route::patch('/advisories/{advisory}/restore', [AdvisoryController::class, 'restore'])->name('advisories.restore');
     Route::resource('alerts', AlertController::class)->except('index', 'show', 'edit');
@@ -34,8 +32,6 @@ Route::middleware(['auth', 'role:admin|editor'])->group(function () {
     Route::get('/weather', [WeatherController::class, 'index'])->name('weather.index');
     Route::get('/crops', [CropsController::class, 'index'])->name('crops.index');
     Route::get('/crops/{crop}', [CropsController::class, 'show'])->name('crops.show');
-    // Route::get('/seeds', [SeedsController::class, 'index'])->name('seeds.index');
-    // Route::get('/seeds/{seed}', [SeedsController::class, 'show'])->name('seeds.show');
     Route::get('/weather-data/{location}', [WeatherController::class, 'getWeather'])->name('weather.data');
     Route::get('/gdd-data/{location}', [WeatherController::class, 'getGddData'])->name('gdd.data');
     Route::get('/advisories', [AdvisoryController::class, 'index'])->name('advisories.index');

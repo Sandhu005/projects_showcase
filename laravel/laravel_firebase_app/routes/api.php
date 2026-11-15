@@ -14,7 +14,6 @@ Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/otp/send', [AuthController::class, 'sendOtp']);
         Route::post('/otp/verify', [AuthController::class, 'verifyOtp']);
-        // Route::post('/guest', [AuthController::class, 'guest']);
         Route::post('/refresh', [AuthController::class, 'refresh']);
         Route::get('/google', [AuthController::class, 'googleRedirect']);
         Route::get('/google/callback', [AuthController::class, 'googleCallback']);
@@ -44,17 +43,4 @@ Route::prefix('v1')->group(function () {
             });
         });
     });
-
-      // Route::middleware('auth:guest')->group(function () {
-    //     Route::prefix('locations')->group(function () {
-    //         Route::get('/popular', [LocationController::class, 'popular']);
-    //         Route::get('/search', [LocationController::class, 'search']);
-    //     });
-
-    //     Route::prefix('crops')->group(function () {
-    //         Route::post('/', [CropController::class, 'index']);
-    //         Route::get('/{id}', [CropController::class, 'show']);
-    //     });
-    // });
-
 });

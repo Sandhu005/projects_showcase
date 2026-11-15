@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\FarmerOtpRequest;
 use App\Http\Requests\Api\Auth\FarmerOtpVerifyRequest;
-use App\Http\Requests\Api\Auth\RefreshTokenRequest;
 use App\Models\Farmer;
 use App\Models\Guest;
 use App\Services\FarmerService;
@@ -13,6 +12,7 @@ use App\Services\OtpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -28,25 +28,31 @@ class AuthController extends Controller
 
         return response()->json([
             'access_token' => $accessToken,
-            'expires_in' => config('jwt.ttl') * 60,
+            'expires_in' => config('jwt.ttl'),
             'farmer_id' => $farmer->id,
         ]);
     }
 
-    public function refresh(RefreshTokenRequest $request)
+    public function refresh()
     {
-        $newAccessToken = JWTAuth::setToken($request->validated('refresh_token'))->refresh();
+        try {
+            $newAccessToken = JWTAuth::parseToken()->refresh();
 
-        return response()->json([
-            'access_token' => $request->validated('refresh_token'),
-            'refresh_token' => $newAccessToken,
-            'expires_in' => config('jwt.ttl') * 60,
-        ]);
+            return response()->json([
+                'access_token' => $newAccessToken,
+                'expires_in' => config('jwt.ttl'),
+            ]);
+        } catch (JWTException $e) {
+            return response()->json([
+                'error' => 'token_invalid',
+                'message' => 'The provided token is invalid or expired.',
+            ], 401);
+        }
     }
 
     public function guest()
     {
-        $guestId = 'guest_' . Str::uuid();
+        $guestId = 'guest_'.Str::uuid();
 
         $guest = new Guest($guestId);
 
@@ -55,7 +61,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $accessToken,
             'guest_id' => $guestId,
-            'expires_in' => config('jwt.ttl') * 60,
+            'expires_in' => config('jwt.ttl'),
         ]);
     }
 
@@ -65,7 +71,7 @@ class AuthController extends Controller
 
         $farmer = $this->farmerService->findByPhone($phone);
 
-        if (!$farmer) {
+        if (! $farmer) {
             $farmerId = $this->farmerService->createPhoneFarmer($phone);
 
             $farmer = [
@@ -83,7 +89,10 @@ class AuthController extends Controller
             ], 403);
         }
 
-        if (($farmer['phone_verified'] ?? true) === false) {
+        if (
+            ($farmer['phone_verified'] ?? false) === false
+            && ($farmer['status'] ?? null) !== 'pending'
+        ) {
             return response()->json([
                 'error' => 'phone_not_verified',
                 'message' => 'An account with this phone number already exists, but the phone number is not verified.',
@@ -98,7 +107,6 @@ class AuthController extends Controller
             'farmer_id' => $farmer['id'],
             'expires_in' => $otp['expires_in'],
             'resend_after' => $otp['resend_after'],
-            'otp' => $otp['otp'],
         ]);
     }
 
@@ -106,7 +114,7 @@ class AuthController extends Controller
     {
         $verified = $this->otpService->verify($request->validated('otp_id'), $request->validated('otp'));
 
-        if (!$verified['success']) {
+        if (! $verified['success']) {
 
             if ($verified['error'] === 'otp_locked') {
                 return response()->json([
@@ -126,7 +134,7 @@ class AuthController extends Controller
         $this->farmerService->markPhoneVerified($farmerId);
         $this->farmerService->updateOnlineStatus($farmerId, true);
 
-        $farmer = new \App\Models\Farmer($farmerId);
+        $farmer = new Farmer($farmerId);
 
         return $this->generateTokens($farmer);
     }
@@ -155,6 +163,7 @@ class AuthController extends Controller
 
         $googleId = $googleUser->getId();
         $email = $googleUser->getEmail();
+        $name = $googleUser->getName();
 
         // Check if farmer exists with Google ID
         $farmer = $this->farmerService->findByGoogleId($googleId);
@@ -216,8 +225,9 @@ class AuthController extends Controller
 
         // NO Farmer FOUND → Create a new farmer with Google ID and email
         $farmerId = $this->farmerService->createGoogleFarmer(
+            $email,
             $googleId,
-            $email
+            $name
         );
 
         $farmerModel = new Farmer($farmerId);

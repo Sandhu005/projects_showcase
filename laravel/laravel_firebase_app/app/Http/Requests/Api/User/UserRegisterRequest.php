@@ -23,11 +23,11 @@ class UserRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'     => 'required|string|max:100',
-            'phone'    => 'required|string|regex:/^\+?[1-9]\d{1,14}$/',
+            'name' => 'required|string|max:100',
+            'phone' => 'required|string|regex:/^[6-9]\d{9}$/',
             'language' => 'required|string|max:20',
             'platform' => 'required|in:windows,mobile',
-            'last_login'  => 'nullable|date',
+            'last_login' => 'nullable|date',
             'last_logout' => 'nullable|date',
         ];
     }

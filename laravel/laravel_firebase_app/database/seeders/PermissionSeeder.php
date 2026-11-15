@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 
@@ -14,35 +13,51 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         Permission::firstOrCreate([
-            'name' => 'manage users'
+            'name' => 'manage users',
         ]);
-        
+
         Permission::firstOrCreate([
-            'name' => 'view users'
+            'name' => 'view users',
         ]);
-        
+
         Permission::firstOrCreate([
-            'name' => 'view farmers'
+            'name' => 'view farmers',
         ]);
-        
+
         Permission::firstOrCreate([
-            'name' => 'view crops'
+            'name' => 'view crops',
         ]);
-        
+
         Permission::firstOrCreate([
-            'name' => 'manage crops'
+            'name' => 'manage crops',
         ]);
-        
+
         Permission::firstOrCreate([
-            'name' => 'view seeds'
+            'name' => 'view seeds',
         ]);
-        
+
         Permission::firstOrCreate([
-            'name' => 'manage seeds'
+            'name' => 'manage seeds',
         ]);
-        
+
         Permission::firstOrCreate([
-            'name' => 'most visited'
+            'name' => 'most visited',
+        ]);
+
+        Permission::firstOrCreate([
+            'name' => 'view advisories',
+        ]);
+
+        Permission::firstOrCreate([
+            'name' => 'manage advisories',
+        ]);
+
+        Permission::firstOrCreate([
+            'name' => 'view alerts',
+        ]);
+
+        Permission::firstOrCreate([
+            'name' => 'manage alerts',
         ]);
     }
 }

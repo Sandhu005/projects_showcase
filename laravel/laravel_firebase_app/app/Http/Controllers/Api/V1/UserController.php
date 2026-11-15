@@ -17,11 +17,31 @@ class UserController extends Controller
         protected WeatherService $weatherService,
     ) {}
 
+    // public function store(UserRegisterRequest $request)
+    // {
+    //     $farmer = $this->farmers->create(
+    //         $request->validated()
+    //     );
+
+    //     if (!$farmer) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Phone number already registered',
+    //         ], 409);
+    //     }
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Farmer registered successfully',
+    //         'data'    => $farmer,
+    //     ], 201);
+    // }
+
     public function me()
     {
         $farmerId = auth('api')->id();
 
-        if (!$farmerId) {
+        if (! $farmerId) {
             return response()->json([
                 'error' => 'unauthenticated',
                 'message' => 'Authentication required.',
@@ -30,7 +50,7 @@ class UserController extends Controller
 
         $farmer = $this->farmers->show($farmerId);
 
-        if (!$farmer) {
+        if (! $farmer) {
             return response()->json([
                 'error' => 'user_not_found',
                 'message' => 'Farmer profile not found.',
@@ -50,8 +70,6 @@ class UserController extends Controller
             'phone' => $farmer['phone'] ?? null,
             'email' => $farmer['email'] ?? null,
             'location' => [
-                'city' => $farmer['location']['city'] ?? null,
-                'state' => $farmer['location']['state'] ?? null,
                 'lat' => $farmer['location']['lat'] ?? null,
                 'lng' => $farmer['location']['lng'] ?? null,
             ],
@@ -67,8 +85,6 @@ class UserController extends Controller
         $this->farmers->updateLocation(
             $farmerId,
             [
-                'city' => $request->validated('city'),
-                'state' => $request->validated('state'),
                 'lat' => $request->validated('lat'),
                 'lng' => $request->validated('lng'),
                 'source' => $request->validated('source'),

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Crop\CropStoreRequest;
 use App\Http\Requests\Crop\CropUpdateRequest;
 use App\Models\Crops;
-use Illuminate\Http\Request;
 
 class CropsController extends Controller
 {
@@ -14,7 +13,8 @@ class CropsController extends Controller
      */
     public function index()
     {
-        $crops = Crops::paginate(10);
+        $crops = Crops::withTrashed()->paginate(10);
+
         return view('crops.index', compact('crops'));
     }
 
@@ -33,7 +33,7 @@ class CropsController extends Controller
     {
         if ($request->hasFile('crop_image')) {
             $image = $request->file('crop_image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $imageName = time().'.'.$image->getClientOriginalExtension();
             $image->move(public_path('images/crops'), $imageName);
         }
 
@@ -60,7 +60,8 @@ class CropsController extends Controller
      */
     public function show(string $id)
     {
-        $data = Crops::findOrFail($id);
+        $data = Crops::withTrashed()->findOrFail($id);
+
         return view('crops.show', compact('data'));
     }
 
@@ -81,7 +82,7 @@ class CropsController extends Controller
 
         if ($request->hasFile('crop_image')) {
             $image = $request->file('crop_image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $imageName = time().'.'.$image->getClientOriginalExtension();
             $image->move(public_path('images/crops'), $imageName);
         } else {
             $imageName = $crop->crop_image;
@@ -113,6 +114,7 @@ class CropsController extends Controller
         $crop = Crops::findOrFail($id);
         $crop->status = 'inactive';
         $crop->save();
+        $crop->delete();
 
         return back()->with('success', 'Crop deleted successfully.');
     }
@@ -122,7 +124,8 @@ class CropsController extends Controller
      */
     public function restore(string $id)
     {
-        $crop = Crops::findOrFail($id);
+        $crop = Crops::withTrashed()->findOrFail($id);
+        $crop->restore();
         $crop->status = 'active';
         $crop->save();
 

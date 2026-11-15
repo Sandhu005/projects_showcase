@@ -2,122 +2,67 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Station;
+use App\Services\WeatherService;
 
 class WeatherController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct(
+        private WeatherService $weatherService
+    ) {}
+
     public function index()
     {
-        $stations = Http::get('location_url');
-        $stationResponse = $stations->json();
+        $stations = Station::where([['status', true], ['state', 'Himachal Pradesh']])->get();
 
-        return view('weather.index', compact('stationResponse'));
+        return view('weather.index', compact('stations'));
     }
 
-
-    public function getWeather($location)
+    public function getWeather(string $location)
     {
         try {
+            $weather = $this->weatherService->getWeatherByLocation($location);
 
-            $url = "url/{$location}.json";
-
-            // Check cache first
-            $data = Cache::get("weather_{$location}");
-
-            // If not in cache, get it from the URL
-            if (!$data) {
-
-                $response = Http::get($url);
-
-                if (!$response->successful()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Unable to get weather data.'
-                    ], 500);
-                }
-
-                $data = $response->json();
-
-                // Save data in cache for 10 minutes
-                Cache::put(
-                    "weather_{$location}",
-                    $data,
-                    now()->addMinutes(10)
-                );
+            if (! $weather) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unable to get weather data.',
+                ], 404);
             }
 
             return response()->json([
                 'success' => true,
-                'data' => $data
+                'data' => $weather,
             ]);
         } catch (\Exception $e) {
-
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
 
-
-    public function getGddData($location)
+    public function getGddData(string $location)
     {
         try {
+            $gddData = $this->weatherService->getGddData($location);
 
-            $url = "gdd_url.json";
-
-            // Check cache first
-            $data = Cache::get('daily_gdd_data');
-
-            // If not in cache, get it from the URL
-            if (!$data) {
-
-                $response = Http::get($url);
-
-                if (!$response->successful()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Unable to get GDD data.'
-                    ], 500);
-                }
-
-                $data = $response->json();
-
-                // Save data in cache for 10 minutes
-                Cache::put(
-                    'daily_gdd_data',
-                    $data,
-                    now()->addMinutes(10)
-                );
-            }
-
-            // Get selected location
-            $gddData = $data[$location] ?? null;
-
-            if (!$gddData) {
+            if (! $gddData) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'GDD data not found for this location.'
+                    'message' => 'GDD data not found for this location.',
                 ], 404);
             }
 
-            // Get today's date
             $today = now()->format('Y-m-d');
 
-            // Find today's record
             $todayRecord = collect($gddData['records'] ?? [])
                 ->firstWhere('date', $today);
 
-            if (!$todayRecord) {
+            if (! $todayRecord) {
                 return response()->json([
                     'success' => false,
-                    'message' => "Today's GDD data is not available."
+                    'message' => "Today's GDD data is not available.",
                 ], 404);
             }
 
@@ -125,14 +70,13 @@ class WeatherController extends Controller
                 'success' => true,
                 'data' => [
                     'station_name' => $gddData['station_name'] ?? null,
-                    'records' => [$todayRecord]
-                ]
+                    'records' => [$todayRecord],
+                ],
             ]);
         } catch (\Exception $e) {
-
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }

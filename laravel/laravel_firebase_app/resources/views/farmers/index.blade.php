@@ -1,36 +1,31 @@
 @extends('layouts.dashboard')
 
-@section('page') Farmers Profile @endsection
+@section('page')
+    Farmers Profile
+@endsection
 
 @section('content')
     <main class="dashboard-content">
         <div class="container-fluid px-3 px-lg-4 py-4">
             <div class="page-heading">
                 <div class="page-heading-copy">
-                    <span class="page-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
+                    <span class="page-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
                     <div>
                         <p class="eyebrow mb-1">Management</p>
                         <h1 class="h3 mb-1">Farmers Profile</h1>
-                        <p class="text-muted mb-0">Monitor performance, sales, users, and support from one clean workspace.
+                        <p class="text-muted mb-0">Registered farmers in the system.
                         </p>
                     </div>
                 </div>
-                <div class="heading-actions"><button class="btn btn-outline-secondary btn-sm" type="button"><i
+                {{-- <div class="heading-actions"><button class="btn btn-outline-secondary btn-sm" type="button"><i
                             class="bi bi-download" aria-hidden="true"></i> Export</button><button
                         class="btn btn-primary btn-sm" type="button"><i class="bi bi-file-earmark-plus"
-                            aria-hidden="true"></i> Create Report</button></div>
+                            aria-hidden="true"></i> Create Report</button>
+                </div> --}}
             </div>
 
 
             <section class="panel mt-3">
-                <div class="panel-header">
-                    <div>
-                        <h2 class="h5 mb-1 section-title"><i class="bi bi-people" aria-hidden="true"></i><span>Recent
-                                Users</span></h2>
-                        <p class="text-muted mb-0">Latest account activity across the workspace.</p>
-                    </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="users.html">Manage Users</a>
-                </div>
                 <div class="table-responsive">
                     <table class="table align-middle mb-0">
                         <thead>

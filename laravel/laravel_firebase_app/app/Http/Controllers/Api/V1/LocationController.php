@@ -3,29 +3,31 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Station;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 
 class LocationController extends Controller
 {
     public function popular()
     {
-        $response = Http::get('https://lotusinfotech.co.in/uhfnew/data/stations.json');
-        return $response->json();
+        return response()->json(
+            Station::where([['status', true], ['state', 'Himachal Pradesh']])->get()
+        );
     }
 
     public function search(Request $request)
     {
-        $city = $request->query('city');
+        $city = trim($request->query('city', ''));
 
-        $response = Http::get('https://lotusinfotech.co.in/uhfnew/data/stations.json');
-        $locations = $response->json();
+        if ($city === '') {
+            return response()->json([
+                'items' => [],
+            ]);
+        }
 
-        $results = collect($locations)->filter(function ($location) use ($city) {
-            $name = strtolower(trim($location['name'] ?? ''));
-            $city = strtolower($city);
-            return str_contains($name, $city);
-        })->values();
+        $results = Station::where([['status', true], ['state', 'Himachal Pradesh']])
+            ->where('name', 'like', '%'.$city.'%')
+            ->get();
 
         return response()->json([
             'items' => $results,

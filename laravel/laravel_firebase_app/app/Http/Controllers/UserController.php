@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
-
 
 class UserController extends Controller
 {
@@ -15,7 +13,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $data = User::with('roles')->paginate(10);
+        $data = User::withTrashed()->with('roles')->paginate(10);
+
         return view('users.index', compact('data'));
     }
 
@@ -44,8 +43,9 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $data = User::with('roles')->findOrFail($id);
-        return view('users.user-detail', compact('data'));
+        $data = User::withTrashed()->with('roles')->findOrFail($id);
+
+        return view('users.show', compact('data'));
     }
 
     /**
@@ -62,23 +62,23 @@ class UserController extends Controller
     public function update(UserUpdateRequest $request, string $id)
     {
 
-        $user = User::findOrFail($id);        
+        $user = User::findOrFail($id);
 
         $user->update($request->validated());
-        
+
         $user->assignRole($request->role);
 
         return redirect()->route('users.show', $id)->with('success', 'User has been updated!!');
     }
-
 
     /**
      * Restore blocked user.
      */
     public function restore(string $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::withTrashed()->findOrFail($id);
 
+        $user->restore();
         $user->update([
             'status' => 'active',
         ]);
@@ -86,7 +86,6 @@ class UserController extends Controller
         return back()->with('success', 'User has been restored!!');
     }
 
-    
     /**
      * Remove the specified resource from storage.
      */
@@ -97,7 +96,8 @@ class UserController extends Controller
         $user->update([
             'status' => 'inactive',
         ]);
+        $user->delete();
 
-        return back()->with('success', 'User has been blocked!!');
+        return back()->with('success', 'User has been deleted.');
     }
 }

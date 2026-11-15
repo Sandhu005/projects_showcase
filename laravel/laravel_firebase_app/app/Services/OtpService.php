@@ -12,11 +12,11 @@ class OtpService
 {
     public function generate(string $phone, string $farmerId): array
     {
-        $key = 'otp:' . $phone;
+        $key = 'otp:'.$phone;
 
-        //Allow a maximum of 3 OTP requests per minute for the same phone number
+        // Allow a maximum of 3 OTP requests per 5 minutes for the same phone number
         $maxAttempts = 3;
-        $decaySeconds = 60;
+        $decaySeconds = 300;
 
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             throw new HttpResponseException(
@@ -29,9 +29,10 @@ class OtpService
 
         RateLimiter::hit($key, $decaySeconds);
 
-        //Generate a 6-digit OTP and a unique OTP ID
-        $otp = (string) random_int(100000, 999999);
-        $optId = 'otp_' . Str::random(12);
+        // Generate a 6-digit OTP and a unique OTP ID
+        // $otp = (string) random_int(100000, 999999);
+        $otp = (string) 123456; // For testing purposes, using a fixed OTP. In production, use the line above.
+        $otpId = 'otp_'.Str::random(12);
 
         // Delete any existing unverified OTPs for the same phone number
         OtpVerification::where('phone', $phone)
@@ -40,19 +41,18 @@ class OtpService
 
         // Store new OTP details in the database
         OtpVerification::create([
-            'otp_id' => $optId,
+            'otp_id' => $otpId,
             'farmer_id' => $farmerId,
             'phone' => $phone,
             'otp_hash' => Hash::make($otp),
             'attempts' => 0,
-            'expires_at' => now()->addSeconds(30),
+            'expires_at' => now()->addSeconds(60),
         ]);
 
         return [
-            'otp_id' => $optId,
-            'otp' => $otp,
-            'expires_in' => 30,
-            'resend_after' => 24,
+            'otp_id' => $otpId,
+            'expires_in' => 60,
+            'resend_after' => 60,
         ];
     }
 
@@ -62,7 +62,7 @@ class OtpService
             ->whereNull('verified_at')
             ->first();
 
-        if (!$record) {
+        if (! $record) {
             return [
                 'success' => false,
                 'error' => 'invalid_code',
@@ -86,7 +86,7 @@ class OtpService
             ];
         }
 
-        if (!Hash::check($code, $record->otp_hash)) {
+        if (! Hash::check($code, $record->otp_hash)) {
 
             $record->increment('attempts');
 

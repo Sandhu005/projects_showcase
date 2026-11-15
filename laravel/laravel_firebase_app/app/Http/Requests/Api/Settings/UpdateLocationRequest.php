@@ -23,11 +23,9 @@ class UpdateLocationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'city' => ['required', 'string', 'max:255',],
-            'state' => ['required', 'string', 'max:255',],
-            'lat' => ['required', 'numeric', 'between:-90,90',],
-            'lng' => ['required', 'numeric', 'between:-180,180',],
-            'source' => ['required', 'string', 'in:gps,manual',],
+            'lat' => ['required', 'numeric', 'between:-90,90'],
+            'lng' => ['required', 'numeric', 'between:-180,180'],
+            'source' => ['required', 'string', 'in:gps,manual'],
         ];
     }
 }

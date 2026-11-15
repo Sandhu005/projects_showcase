@@ -1,6 +1,8 @@
 @extends('layouts.dashboard')
 
-@section('page') Dashboard @endsection
+@section('page')
+    Dashboard
+@endsection
 
 @section('content')
     <main class="dashboard-content">
@@ -11,27 +13,23 @@
                     <div>
                         <p class="eyebrow mb-1">Overview</p>
                         <h1 class="h3 mb-1">Dashboard</h1>
-                        <p class="text-muted mb-0">Monitor performance, sales, users, and support from one clean workspace.
+                        <p class="text-muted mb-0">Monitor Farmers, advisories, alerts, and crops.
                         </p>
                     </div>
                 </div>
-                <div class="heading-actions"><button class="btn btn-outline-secondary btn-sm" type="button"><i
-                            class="bi bi-download" aria-hidden="true"></i> Export</button><button
-                        class="btn btn-primary btn-sm" type="button"><i class="bi bi-file-earmark-plus"
-                            aria-hidden="true"></i> Create Report</button></div>
             </div>
 
             <section class="row g-3 mt-1" aria-label="Dashboard metrics">
                 <div class="col-12 col-sm-6 col-xl-3">
                     <article class="metric-card metric-primary">
                         <div class="metric-top">
-                            <span class="metric-label">Revenue</span>
-                            <span class="metric-icon"><i class="bi bi-currency-dollar" aria-hidden="true"></i></span>
+                            <span class="metric-label">Farmers</span>
+                            <span class="metric-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
                         </div>
-                        <div class="metric-value">$48,240</div>
+                        <div class="metric-value">{{ $totalActiveFarmers }}</div>
                         <div class="metric-meta">
-                            <span class="text-success">+12.5%</span>
-                            <span>from last month</span>
+                            <span class="text-primary">Active</span>
+                            <span>farmers count</span>
                         </div>
                     </article>
                 </div>
@@ -39,13 +37,13 @@
                 <div class="col-12 col-sm-6 col-xl-3">
                     <article class="metric-card metric-success">
                         <div class="metric-top">
-                            <span class="metric-label">Orders</span>
-                            <span class="metric-icon"><i class="bi bi-bag-check" aria-hidden="true"></i></span>
+                            <span class="metric-label">Crops</span>
+                            <span class="metric-icon"><i class="bi bi-leaf" aria-hidden="true"></i></span>
                         </div>
-                        <div class="metric-value">1,284</div>
+                        <div class="metric-value">{{ $totalActiveCrops }}</div>
                         <div class="metric-meta">
-                            <span class="text-success">+8.2%</span>
-                            <span>new orders</span>
+                            <span class="text-success">Active</span>
+                            <span>crops count</span>
                         </div>
                     </article>
                 </div>
@@ -53,13 +51,13 @@
                 <div class="col-12 col-sm-6 col-xl-3">
                     <article class="metric-card metric-warning">
                         <div class="metric-top">
-                            <span class="metric-label">Customers</span>
-                            <span class="metric-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+                            <span class="metric-label">Advisories</span>
+                            <span class="metric-icon"><i class="bi bi-bell" aria-hidden="true"></i></span>
                         </div>
-                        <div class="metric-value">8,742</div>
+                        <div class="metric-value">{{ $totalActiveAdvisories }}</div>
                         <div class="metric-meta">
-                            <span class="text-success">+5.1%</span>
-                            <span>active users</span>
+                            <span class="text-warning">Active</span>
+                            <span>advisories count</span>
                         </div>
                     </article>
                 </div>
@@ -67,20 +65,20 @@
                 <div class="col-12 col-sm-6 col-xl-3">
                     <article class="metric-card metric-danger">
                         <div class="metric-top">
-                            <span class="metric-label">Tickets</span>
-                            <span class="metric-icon"><i class="bi bi-life-preserver" aria-hidden="true"></i></span>
+                            <span class="metric-label">Alerts</span>
+                            <span class="metric-icon"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span>
                         </div>
-                        <div class="metric-value">36</div>
+                        <div class="metric-value">{{ $totalActiveAlerts }}</div>
                         <div class="metric-meta">
-                            <span class="text-danger">3 urgent</span>
-                            <span>need review</span>
+                            <span class="text-danger">Active</span>
+                            <span>alerts count</span>
                         </div>
                     </article>
                 </div>
             </section>
 
             <section class="row g-3 mt-1">
-                <div class="col-12 col-xl-8">
+                {{-- <div class="col-12 col-xl-6">
                     <div class="panel">
                         <div class="panel-header">
                             <div>
@@ -100,37 +98,76 @@
                             <div class="chart-column bar-83"><span></span><small>Jun</small></div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
-                <div class="col-12 col-xl-4">
+                <div class="col-12 col-xl-6">
                     <div class="panel h-100">
                         <div class="panel-header">
                             <div>
-                                <h2 class="h5 mb-1 section-title"><i class="bi bi-activity"
-                                        aria-hidden="true"></i><span>Team Activity</span></h2>
-                                <p class="text-muted mb-0">Recent operational updates.</p>
+                                <h2 class="h5 mb-1 section-title"><i class="bi bi-bell" aria-hidden="true"></i><span>Recent
+                                        Advisories</span></h2>
                             </div>
                         </div>
 
-                        <div class="activity-list">
-                            <div class="activity-item"><span class="activity-dot bg-primary"></span>
-                                <div>
-                                    <p class="mb-1 fw-semibold">New campaign launched</p>
-                                    <p class="text-muted small mb-0">Marketing team published the May offer.</p>
-                                </div>
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Title</th>
+                                        <th scope="col" class="text-end">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($advisories as $advisory)
+                                        <tr>
+                                            <td>{{ $advisory->title_en }}</td>
+                                            <td class="text-end">
+                                                @if ($advisory->valid_until > now())
+                                                    <span class="badge text-bg-success">Active</span>
+                                                @else
+                                                    <span class="badge text-bg-secondary">Expired</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-xl-6">
+                    <div class="panel h-100">
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="h5 mb-1 section-title"><i class="bi bi-exclamation-triangle"
+                                        aria-hidden="true"></i><span>Recent Alerts</span></h2>
                             </div>
-                            <div class="activity-item"><span class="activity-dot bg-success"></span>
-                                <div>
-                                    <p class="mb-1 fw-semibold">Payment batch cleared</p>
-                                    <p class="text-muted small mb-0">246 invoices were processed successfully.</p>
-                                </div>
-                            </div>
-                            <div class="activity-item"><span class="activity-dot bg-warning"></span>
-                                <div>
-                                    <p class="mb-1 fw-semibold">Support queue rising</p>
-                                    <p class="text-muted small mb-0">Average first response time is 18 minutes.</p>
-                                </div>
-                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Title</th>
+                                        <th scope="col" class="text-end">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($alerts as $alert)
+                                        <tr>
+                                            <td>{{ $alert->title_en }}</td>
+                                            <td class="text-end">
+                                                @if ($alert->valid_until > now())
+                                                    <span class="badge text-bg-success">Active</span>
+                                                @else
+                                                    <span class="badge text-bg-secondary">Expired</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -170,7 +207,7 @@
                                     </td>
                                     <td>{{ $data['role'] }}</td>
                                     <td>
-                                        @if($data['online'] === true)
+                                        @if ($data['online'] === true)
                                         <span class="badge text-bg-success">Online</span>
                                         @else
                                         <span class="badge text-bg-secondary">Offline</span>

@@ -1,14 +1,14 @@
 <?php
 
+use App\Http\Controllers\AdvisoryController;
+use App\Http\Controllers\AlertController;
 use App\Http\Controllers\CropsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SeedsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WeatherController;
 use Illuminate\Support\Facades\Route;
-
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -20,6 +20,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::patch('/crops/{crop}/restore', [CropsController::class, 'restore'])->name('crops.restore');
     // Route::resource('seeds', SeedsController::class)->except('index', 'show');
     // Route::patch('/seeds/{seed}/restore', [SeedsController::class, 'restore'])->name('seeds.restore');
+    Route::resource('advisories', AdvisoryController::class)->except('index', 'show');
+    Route::patch('/advisories/{advisory}/restore', [AdvisoryController::class, 'restore'])->name('advisories.restore');
+    Route::resource('alerts', AlertController::class)->except('index', 'show', 'edit');
+    Route::patch('/alerts/{alert}/restore', [AlertController::class, 'restore'])->name('alerts.restore');
 });
 
 Route::middleware(['auth', 'role:admin|editor'])->group(function () {
@@ -34,6 +38,10 @@ Route::middleware(['auth', 'role:admin|editor'])->group(function () {
     // Route::get('/seeds/{seed}', [SeedsController::class, 'show'])->name('seeds.show');
     Route::get('/weather-data/{location}', [WeatherController::class, 'getWeather'])->name('weather.data');
     Route::get('/gdd-data/{location}', [WeatherController::class, 'getGddData'])->name('gdd.data');
+    Route::get('/advisories', [AdvisoryController::class, 'index'])->name('advisories.index');
+    Route::get('/advisories/{advisory}', [AdvisoryController::class, 'show'])->name('advisories.show');
+    Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
+    Route::get('/alerts/{alert}', [AlertController::class, 'show'])->name('alerts.show');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

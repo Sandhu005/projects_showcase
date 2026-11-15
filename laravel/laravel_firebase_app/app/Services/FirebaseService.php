@@ -4,7 +4,6 @@ namespace App\Services;
 
 use Kreait\Firebase\Factory;
 
-
 class FirebaseService
 {
     protected $database;

@@ -9,17 +9,20 @@
         <div class="container-fluid px-3 px-lg-4 py-4">
             <div class="page-heading">
                 <div class="page-heading-copy">
-                    <span class="page-icon"><i class="bi bi-card-checklist" aria-hidden="true"></i></span>
+                    <span class="page-icon"><i class="bi bi-leaf" aria-hidden="true"></i></span>
                     <div>
                         <p class="eyebrow mb-1">List</p>
                         <h1 class="h3 mb-1">Crops List</h1>
                         <p class="text-muted mb-0">All crops in the system.</p>
                     </div>
                 </div>
-                <div class="heading-actions"><button class="btn btn-outline-secondary btn-sm" type="button"><i
-                            class="bi bi-download" aria-hidden="true"></i> Export</button><button
-                        class="btn btn-primary btn-sm" type="button"><i class="bi bi-file-earmark-plus"
-                            aria-hidden="true"></i> Create Report</button>
+                <div class="heading-actions">
+                    {{-- <button class="btn btn-outline-secondary btn-sm" type="button"><i class="bi bi-download"
+                            aria-hidden="true"></i> Export</button> --}}
+                    @can('manage crops')
+                        <a class="btn btn-primary btn-sm" href="{{ route('crops.create') }}"><i class="bi bi-plus"
+                                aria-hidden="true"></i> Add Crop</a>
+                    @endcan
                 </div>
             </div>
 
@@ -40,14 +43,14 @@
             <section class="panel">
                 <div class="panel-header">
                     <div>
-                        <h2 class="h5 mb-1 section-title"><i class="bi bi-card-checklist" aria-hidden="true"></i><span>Crops
+                        <h2 class="h5 mb-1 section-title"><i class="bi bi-leaf" aria-hidden="true"></i><span>Crops
                                 Details</span></h2>
                         <p class="text-muted mb-0">Manage and view all crops in the system.</p>
                     </div><input class="form-control form-control-sm table-search" type="search" placeholder="Search crops"
                         data-table-search="cropsTable" aria-label="Search crops">
                 </div>
                 <div class="table-responsive">
-                    <table class="table align-middle mb-0" id="ordersTable" data-searchable-table>
+                    <table class="table align-middle mb-0" id="cropsTable" data-searchable-table>
                         <thead>
                             <tr>
                                 <th>Crop Name</th>
@@ -86,7 +89,7 @@
                                                 class="bi bi-eye"></i></a>
 
                                         @can('manage crops')
-                                            @if ($crop->status == 'active')
+                                            @if (!$crop->trashed())
                                                 <form action="{{ route('crops.destroy', $crop->id) }}" method="post">
                                                     @csrf
                                                     @method('DELETE')

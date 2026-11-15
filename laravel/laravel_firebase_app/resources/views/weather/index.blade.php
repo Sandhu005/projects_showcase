@@ -9,7 +9,7 @@
         <div class="container-fluid px-3 px-lg-4 py-4">
             <div class="page-heading">
                 <div class="page-heading-copy">
-                    <span class="page-icon"><i class="bi bi-table" aria-hidden="true"></i></span>
+                    <span class="page-icon"><i class="bi bi-cloud-drizzle" aria-hidden="true"></i></span>
                     <div>
                         <p class="eyebrow mb-1">Data</p>
                         <h1 class="h3 mb-1">Weather</h1>
@@ -17,11 +17,11 @@
                     </div>
                 </div>
                 <div>
-                    <label for="location" class="form-label text-primary fw-bold">Select Location</label>
+                    <label for="location" class="form-label eyebrow">Select Location</label>
                     <select class="form-control form-control-sm table-search" name="location" id="location">
                         <option value="">Select Location</option>
-                        @foreach ($stationResponse as $station)
-                            <option value="{{ $station['id'] }}">{{ $station['name'] }}</option>
+                        @foreach ($stations as $station)
+                            <option value="{{ $station['station_id'] }}">{{ $station['name'] }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -30,7 +30,7 @@
             <section class="panel mb-4">
                 <div class="panel-header">
                     <div>
-                        <h2 class="h5 mb-1 section-title"><i class="bi bi-table" aria-hidden="true"></i><span>GDD/AGDD
+                        <h2 class="h5 mb-1 section-title"><i class="bi bi-cloud-drizzle" aria-hidden="true"></i><span>GDD/AGDD
                                 Forecast</span></h2>
                     </div>
                     {{-- <input class="form-control form-control-sm table-search" type="search"
@@ -61,7 +61,7 @@
             <section class="panel">
                 <div class="panel-header">
                     <div>
-                        <h2 class="h5 mb-1 section-title"><i class="bi bi-table" aria-hidden="true"></i><span>Weather
+                        <h2 class="h5 mb-1 section-title"><i class="bi bi-cloud-drizzle" aria-hidden="true"></i><span>Weather
                                 Forecast</span></h2>
                         {{-- <p class="text-muted mb-0">IMD data.</p> --}}
                     </div>
@@ -186,7 +186,7 @@
                         throw new Error(result.message || 'Unable to load weather data');
                     }
 
-                    weatherPredictions = result.data?.predictions || [];
+                    weatherPredictions = result.data || [];
 
                     currentPage = 1;
 
@@ -214,7 +214,6 @@
             | Fetch GDD Data
             |--------------------------------------------------------------------------
             */
-
             fetch(gddUrl, {
                     method: 'GET',
                     headers: {
@@ -231,8 +230,6 @@
                     return response.json();
                 })
                 .then(result => {
-
-                    console.log('GDD Response:', result);
 
                     if (!result.success) {
                         throw new Error(
@@ -378,7 +375,7 @@
 
             previousButton.type = 'button';
             previousButton.className =
-                'btn btn-sm btn-outline-primary me-1';
+                'btn btn-sm btn-outline-success me-1';
 
             previousButton.textContent = 'Previous';
 
@@ -410,8 +407,8 @@
                 pageButton.className =
                     `btn btn-sm ${
                     page === currentPage
-                        ? 'btn-primary'
-                        : 'btn-outline-primary'
+                        ? 'btn-success'
+                        : 'btn-outline-success'
                 } me-1`;
 
                 pageButton.textContent = page;
@@ -435,7 +432,7 @@
             nextButton.type = 'button';
 
             nextButton.className =
-                'btn btn-sm btn-outline-primary';
+                'btn btn-sm btn-outline-success';
 
             nextButton.textContent = 'Next';
 

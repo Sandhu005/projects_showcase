@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('form-name') Login @endsection
+@section('form-name') Login Page @endsection
 
 @section('content')
 

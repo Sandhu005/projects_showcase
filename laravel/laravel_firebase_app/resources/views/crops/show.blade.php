@@ -63,7 +63,8 @@
                             <div class="info-list mt-4 text-start">
                                 <div><span>Season</span><strong>{{ $data->crop_season }}</strong></div>
                                 <div><span>Type</span><strong>{{ $data->crop_type }}</strong></div>
-                                <div><span>Created at</span><strong>{{ $data->created_at->format('M j, Y') }}</strong></div>
+                                <div><span>Created at</span><strong>{{ $data->created_at->format('M j, Y') }}</strong>
+                                </div>
                                 <div><span>Updated at</span><strong>{{ $data->updated_at->format('M j, Y') }}</strong>
                                 </div>
                             </div>
@@ -108,7 +109,7 @@
                                 <h2 class="h5 mb-1 section-title"><i class="bi bi-book"
                                         aria-hidden="true"></i><span>Detailed information</span></h2>
                             </div>
-                             @can('manage crops')
+                            @can('manage crops')
                                 <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal"
                                     data-bs-target="#formModal">Edit Crop</button>
                             @endcan
@@ -118,56 +119,56 @@
                                 <span class="activity-dot bg-primary"></span>
                                 <div>
                                     <p class="mb-1 fw-semibold">Variety</p>
-                                    <p class="text-muted small mb-0">{{$data->variety}}</p>
+                                    <p class="text-muted small mb-0">{{ $data->variety }}</p>
                                 </div>
                             </div>
                             <div class="activity-item">
                                 <span class="activity-dot bg-success"></span>
                                 <div>
                                     <p class="mb-1 fw-semibold">Sowing Method</p>
-                                    <p class="text-muted small mb-0">{{$data->sowing_method}}</p>
+                                    <p class="text-muted small mb-0">{{ $data->sowing_method }}</p>
                                 </div>
                             </div>
                             <div class="activity-item">
                                 <span class="activity-dot bg-warning"></span>
                                 <div>
                                     <p class="mb-1 fw-semibold">Irrigation</p>
-                                    <p class="text-muted small mb-0">{{$data->irrigation}}</p>
+                                    <p class="text-muted small mb-0">{{ $data->irrigation }}</p>
                                 </div>
                             </div>
                             <div class="activity-item">
                                 <span class="activity-dot bg-secondary"></span>
                                 <div>
                                     <p class="mb-1 fw-semibold">Fertilizers</p>
-                                    <p class="text-muted small mb-0">{{$data->fertilizers}}</p>
+                                    <p class="text-muted small mb-0">{{ $data->fertilizers }}</p>
                                 </div>
                             </div>
                             <div class="activity-item">
                                 <span class="activity-dot bg-info"></span>
                                 <div>
                                     <p class="mb-1 fw-semibold">Plant Protection</p>
-                                    <p class="text-muted small mb-0">{{$data->plant_protection}}</p>
+                                    <p class="text-muted small mb-0">{{ $data->plant_protection }}</p>
                                 </div>
                             </div>
                             <div class="activity-item">
                                 <span class="activity-dot bg-danger"></span>
                                 <div>
                                     <p class="mb-1 fw-semibold">Deficiency</p>
-                                    <p class="text-muted small mb-0">{{$data->deficiency}}</p>
+                                    <p class="text-muted small mb-0">{{ $data->deficiency }}</p>
                                 </div>
                             </div>
                             <div class="activity-item">
                                 <span class="activity-dot bg-light"></span>
                                 <div>
                                     <p class="mb-1 fw-semibold">Weeds</p>
-                                    <p class="text-muted small mb-0">{{$data->weeds}}</p>
+                                    <p class="text-muted small mb-0">{{ $data->weeds }}</p>
                                 </div>
                             </div>
                             <div class="activity-item">
                                 <span class="activity-dot bg-dark"></span>
                                 <div>
                                     <p class="mb-1 fw-semibold">Advisory</p>
-                                    <p class="text-muted small mb-0">{{$data->advisory}}</p>
+                                    <p class="text-muted small mb-0">{{ $data->advisory }}</p>
                                 </div>
                             </div>
                         </div>
@@ -183,14 +184,16 @@
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <form class="panel needs-validation" novalidate action="{{ route('crops.update', $data->id) }}"
-                        method="post">
+                        method="post" enctype="multipart/form-data">
                         @csrf
                         @method('PATCH')
                         <div class="panel-header">
                             <div>
                                 <h2 class="h5 mb-1 section-title"><i class="bi bi-leaf" aria-hidden="true"></i><span>Update Crop
                                         Details</span></h2>
-                                <p class="text-muted mb-0">Update crop information with validated fields.</p>
+                            </div>
+                            <div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                         </div>
                         <div class="row g-3">
@@ -227,42 +230,42 @@
                             </div>
 
                             <div class="col-md-6"><label class="form-label" for="variety">Variety</label>
-                                <textarea class="form-control" id="variety" name="variety" rows="3" required>{{ old('variety') }}</textarea>
+                                <textarea class="form-control" id="variety" name="variety" rows="3" required>{{ old('variety', $data->variety) }}</textarea>
                                 <div class="invalid-feedback">Variety is required.</div>
                             </div>
 
                             <div class="col-md-6"><label class="form-label" for="sowing_method">Sowing Method</label>
-                                <textarea class="form-control" id="sowing_method" name="sowing_method" rows="3" required>{{ old('sowing_method') }}</textarea>
+                                <textarea class="form-control" id="sowing_method" name="sowing_method" rows="3" required>{{ old('sowing_method', $data->sowing_method) }}</textarea>
                                 <div class="invalid-feedback">Sowing method is required.</div>
                             </div>
 
                             <div class="col-md-6"><label class="form-label" for="irrigation">Irrigation</label>
-                                <textarea class="form-control" id="irrigation" name="irrigation" rows="3" required>{{ old('irrigation') }}</textarea>
+                                <textarea class="form-control" id="irrigation" name="irrigation" rows="3" required>{{ old('irrigation', $data->irrigation) }}</textarea>
                                 <div class="invalid-feedback">Irrigation information is required.</div>
                             </div>
 
                             <div class="col-md-6"><label class="form-label" for="fertilizers">Fertilizers</label>
-                                <textarea class="form-control" id="fertilizers" name="fertilizers" rows="3" required>{{ old('fertilizers') }}</textarea>
+                                <textarea class="form-control" id="fertilizers" name="fertilizers" rows="3" required>{{ old('fertilizers', $data->fertilizers) }}</textarea>
                                 <div class="invalid-feedback">Fertilizer information is required.</div>
                             </div>
 
                             <div class="col-md-6"><label class="form-label" for="plant_protection">Plant Protection</label>
-                                <textarea class="form-control" id="plant_protection" name="plant_protection" rows="3" required>{{ old('plant_protection') }}</textarea>
+                                <textarea class="form-control" id="plant_protection" name="plant_protection" rows="3" required>{{ old('plant_protection', $data->plant_protection) }}</textarea>
                                 <div class="invalid-feedback">Plant protection information is required.</div>
                             </div>
 
                             <div class="col-md-6"><label class="form-label" for="deficiency">Deficiency</label>
-                                <textarea class="form-control" id="deficiency" name="deficiency" rows="3" required>{{ old('deficiency') }}</textarea>
+                                <textarea class="form-control" id="deficiency" name="deficiency" rows="3" required>{{ old('deficiency', $data->deficiency) }}</textarea>
                                 <div class="invalid-feedback">Deficiency information is required.</div>
                             </div>
 
                             <div class="col-md-6"><label class="form-label" for="weeds">Weeds</label>
-                                <textarea class="form-control" id="weeds" name="weeds" rows="3" required>{{ old('weeds') }}</textarea>
+                                <textarea class="form-control" id="weeds" name="weeds" rows="3" required>{{ old('weeds', $data->weeds) }}</textarea>
                                 <div class="invalid-feedback">Weed information is required.</div>
                             </div>
 
                             <div class="col-md-6"><label class="form-label" for="advisory">Advisory</label>
-                                <textarea class="form-control" id="advisory" name="advisory" rows="3" required>{{ old('advisory') }}</textarea>
+                                <textarea class="form-control" id="advisory" name="advisory" rows="3" required>{{ old('advisory', $data->advisory) }}</textarea>
                                 <div class="invalid-feedback">Advisory information is required.</div>
                             </div>
 

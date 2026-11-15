@@ -122,7 +122,7 @@
     @can('manage seeds')
         {{-- Edit Form Model --}}
         <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <form class="panel needs-validation" novalidate action="{{ route('seeds.update', $seed->id) }}"
                         method="post">
@@ -132,7 +132,9 @@
                             <div>
                                 <h2 class="h5 mb-1 section-title"><i class="bi bi-tree" aria-hidden="true"></i><span>Update Seed
                                         Details</span></h2>
-                                <p class="text-muted mb-0">Update seed information with validated fields.</p>
+                            </div>
+                            <div>
+                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                         </div>
                         <div class="row g-3">

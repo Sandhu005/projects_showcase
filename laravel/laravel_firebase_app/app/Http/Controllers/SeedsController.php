@@ -6,7 +6,6 @@ use App\Http\Requests\Seed\SeedStoreRequest;
 use App\Http\Requests\Seed\SeedUpdateRequest;
 use App\Models\Crops;
 use App\Models\Seeds;
-use Illuminate\Http\Request;
 
 class SeedsController extends Controller
 {
@@ -15,7 +14,8 @@ class SeedsController extends Controller
      */
     public function index()
     {
-        $seeds = Seeds::with('crop')->paginate(10);
+        $seeds = Seeds::withTrashed()->with('crop')->paginate(10);
+
         return view('seeds.index', compact('seeds'));
     }
 
@@ -25,6 +25,7 @@ class SeedsController extends Controller
     public function create()
     {
         $crops = Crops::all();
+
         return view('seeds.create', compact('crops'));
     }
 
@@ -44,7 +45,8 @@ class SeedsController extends Controller
     public function show(string $id)
     {
         $crops = Crops::all();
-        $seed = Seeds::with('crop')->findOrFail($id);
+        $seed = Seeds::withTrashed()->with('crop')->findOrFail($id);
+
         return view('seeds.show', compact('seed', 'crops'));
     }
 
@@ -55,6 +57,7 @@ class SeedsController extends Controller
     {
         $seed = Seeds::findOrFail($id);
         $crops = Crops::all();
+
         return view('seeds.edit', compact('seed', 'crops'));
     }
 
@@ -77,13 +80,15 @@ class SeedsController extends Controller
         $seed = Seeds::findOrFail($id);
         $seed->status = 'inactive';
         $seed->save();
+        $seed->delete();
 
         return back()->with('success', 'Seed deleted successfully.');
     }
 
     public function restore(string $id)
     {
-        $seed = Seeds::findOrFail($id);
+        $seed = Seeds::withTrashed()->findOrFail($id);
+        $seed->restore();
         $seed->status = 'active';
         $seed->save();
 

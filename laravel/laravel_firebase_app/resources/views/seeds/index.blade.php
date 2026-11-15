@@ -84,7 +84,7 @@
                                                 class="bi bi-eye"></i></a>
 
                                         @can('manage seeds')
-                                            @if ($seed->status == 'active')
+                                            @if (!$seed->trashed())
                                                 <form action="{{ route('seeds.destroy', $seed->id) }}" method="post">
                                                     @csrf
                                                     @method('DELETE')

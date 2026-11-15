@@ -19,9 +19,9 @@
         <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
             <div class="sidebar-header">
                 <a class="brand-mark" href="index.html" aria-label="adminHMD dashboard">
-                    <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
+                    <span class="brand-icon"><i class="bi bi-leaf-fill" aria-hidden="true"></i></span>
                     <span class="brand-copy">
-                        <span class="brand-title">Admin Dashboard</span>
+                        <span class="brand-title">Krishi Dashboard</span>
                         <span class="brand-subtitle">Admin</span>
                     </span>
                 </a>
@@ -33,6 +33,8 @@
                     <span class="nav-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
                     <span class="nav-text">Dashboard</span>
                 </a>
+
+                <!-- Farmers Menu -->
                 <a class="nav-link {{ request()->routeIs('farmers.index') ? 'active' : '' }}"
                     href="{{ route('farmers.index') }}">
                     <span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
@@ -49,18 +51,18 @@
                 </a>
 
                 <div class="collapse {{ request()->routeIs('users.*') ? 'show' : '' }}" id="usersMenu">
+                    <a class="nav-link ps-5 {{ request()->routeIs('users.index') ? 'active' : '' }}"
+                        href="{{ route('users.index') }}">
+                        View Users
+                    </a>
                     @can('manage users')
                         <a class="nav-link ps-5 {{ request()->routeIs('users.create') ? 'active' : '' }}"
                             href="{{ route('users.create') }}">
                             Add User
                         </a>
                     @endcan
-                    <a class="nav-link ps-5 {{ request()->routeIs('users.index') ? 'active' : '' }}"
-                        href="{{ route('users.index') }}">
-                        View Users
-                    </a>
                 </div>
-                
+
                 <!-- Crops Menu -->
                 <a class="nav-link" data-bs-toggle="collapse" href="#cropsMenu">
                     <span class="nav-icon">
@@ -71,19 +73,61 @@
                 </a>
 
                 <div class="collapse {{ request()->routeIs('crops.*') ? 'show' : '' }}" id="cropsMenu">
+                    <a class="nav-link ps-5 {{ request()->routeIs('crops.index') ? 'active' : '' }}"
+                        href="{{ route('crops.index') }}">
+                        View Crops
+                    </a>
                     @can('manage crops')
                         <a class="nav-link ps-5 {{ request()->routeIs('crops.create') ? 'active' : '' }}"
                             href="{{ route('crops.create') }}">
                             Add Crop
                         </a>
                     @endcan
-                    <a class="nav-link ps-5 {{ request()->routeIs('crops.index') ? 'active' : '' }}"
-                        href="{{ route('crops.index') }}">
-                        View Crops
-                    </a>
                 </div>
                 
+                <!-- Advisory Menu -->
+                <a class="nav-link" data-bs-toggle="collapse" href="#advisoryMenu">
+                    <span class="nav-icon">
+                        <i class="bi bi-bell"></i>
+                    </span>
+                    <span class="nav-text">Advisories</span>
+                    <i class="bi bi-chevron-down float-end"></i>
+                </a>
+
+                <div class="collapse {{ request()->routeIs('advisories.*') ? 'show' : '' }}" id="advisoryMenu">
+                    <a class="nav-link ps-5 {{ request()->routeIs('advisories.index') ? 'active' : '' }}"
+                        href="{{ route('advisories.index') }}">
+                        View Advisories
+                    </a>
+                    @can('manage advisories')
+                        <a class="nav-link ps-5 {{ request()->routeIs('advisories.create') ? 'active' : '' }}"
+                            href="{{ route('advisories.create') }}">
+                            Create Advisory
+                        </a>
+                    @endcan
+                </div>
+
                 <!-- Seeds Menu -->
+                                <a class="nav-link" data-bs-toggle="collapse" href="#alertsMenu">
+                                    <span class="nav-icon"><i class="bi bi-exclamation-triangle"></i></span>
+                                    <span class="nav-text">Alerts</span>
+                                    <i class="bi bi-chevron-down float-end"></i>
+                                </a>
+
+                                <div class="collapse {{ request()->routeIs('alerts.*') ? 'show' : '' }}" id="alertsMenu">
+                                    <a class="nav-link ps-5 {{ request()->routeIs('alerts.index') ? 'active' : '' }}"
+                                        href="{{ route('alerts.index') }}">
+                                        View Alerts
+                                    </a>
+                                    @can('manage alerts')
+                                        <a class="nav-link ps-5 {{ request()->routeIs('alerts.create') ? 'active' : '' }}"
+                                            href="{{ route('alerts.create') }}">
+                                            Create Alert
+                                        </a>
+                                    @endcan
+                                </div>
+
+                                <!-- Seeds Menu -->
                 {{-- <a class="nav-link" data-bs-toggle="collapse" href="#seedsMenu">
                     <span class="nav-icon">
                         <i class="bi bi-tree"></i>
@@ -104,9 +148,9 @@
                         View Seeds
                     </a>
                 </div> --}}
-                
+
                 <a class="nav-link" href="{{ route('weather.index') }}">
-                    <span class="nav-icon"><i class="bi bi-bar-chart-line" aria-hidden="true"></i></span>
+                    <span class="nav-icon"><i class="bi bi-cloud-drizzle" aria-hidden="true"></i></span>
                     <span class="nav-text">Weather Data</span>
                 </a>
 
@@ -166,7 +210,7 @@
 
                     <form class="d-none d-md-flex ms-3 flex-grow-1" role="search">
                         <input class="form-control search-input" type="search"
-                            placeholder="Search users, orders, reports" aria-label="Search">
+                            placeholder="Search crops, advisories, alerts" aria-label="Search">
                     </form>
 
                     <div class="navbar-actions ms-auto">
@@ -174,9 +218,9 @@
                             aria-label="Switch color theme" title="Switch color theme">
                             <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
                         </button>
-                        <div class="dropdown">
-                            <button class="icon-button" type="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                aria-label="Notifications">
+                        {{-- <div class="dropdown">
+                            <button class="icon-button" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false" aria-label="Notifications">
                                 <span class="notification-dot"></span>
                                 <i class="bi bi-bell" aria-hidden="true"></i>
                             </button>
@@ -195,7 +239,7 @@
                                     <span class="notification-time">1 hour ago</span>
                                 </a>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="dropdown">
                             <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -205,8 +249,8 @@
                                 <span class="profile-name d-none d-sm-inline">Admin {{ $user['name'] }}</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="profile.html">Profile</a></li>
-                                <li><a class="dropdown-item" href="settings.html">Account settings</a></li>
+                                <li><a class="dropdown-item" href="">Profile</a></li>
+                                <li><a class="dropdown-item" href="">Account settings</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>

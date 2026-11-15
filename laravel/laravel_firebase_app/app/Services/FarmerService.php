@@ -2,9 +2,7 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Str;
 
 class FarmerService
 {
@@ -23,13 +21,13 @@ class FarmerService
 
     public function show(string $id)
     {
-        $farmer = $this->firebase->database()->getReference('farmers/' . $id)->getValue();
+        $farmer = $this->firebase->database()->getReference('farmers/'.$id)->getValue();
 
-        if (!$farmer) {
+        if (! $farmer) {
             return null;
         }
 
-        //Checking if account is being deleted
+        // Checking if account is being deleted
         if (($farmer['status'] ?? 'active') === 'deleted') {
             return null;
         }
@@ -41,90 +39,121 @@ class FarmerService
     {
         $database = $this->firebase->database();
 
-        // Get next ID
-        $counter = $database
-            ->getReference('farmer_counter')
-            ->getValue();
-
-        $counter = ($counter ?? 0) + 1;
-
-        // Save counter
-        $database
-            ->getReference('farmer_counter')
-            ->set($counter);
-
         // Create farmer ID
-        $id = 'farmer_' . str_pad($counter, 3, '0', STR_PAD_LEFT);
+        $id = (string) Str::uuid();
 
         // Farmer data
         $farmer = [
-            'id'          => $id,
-            'phone'       => $phone,
+            'id' => $id,
+            'phone' => $phone,
             'phone_verified' => false,
             'email' => null,
             'email_verified' => false,
             'google_id' => null,
-            'online'      => false,
-            'status'      => 'pending',
-            'created_at'  => now()->toIso8601String(),
+            'online' => false,
+            'status' => 'pending',
+            'created_at' => now()->toIso8601String(),
         ];
 
         // Save farmer
         $database
-            ->getReference('farmers/' . $id)
+            ->getReference('farmers/'.$id)
             ->set($farmer);
 
         return $id;
     }
 
-    public function createGoogleFarmer(string $email, string $googleId)
+    public function createGoogleFarmer(string $email, string $googleId, string $name)
     {
         $database = $this->firebase->database();
 
-        // Get next ID
-        $counter = $database
-            ->getReference('farmer_counter')
-            ->getValue();
-
-        $counter = ($counter ?? 0) + 1;
-
-        // Save counter
-        $database
-            ->getReference('farmer_counter')
-            ->set($counter);
-
         // Create farmer ID
-        $id = 'farmer_' . str_pad($counter, 3, '0', STR_PAD_LEFT);
+        $id = (string) Str::uuid();
 
         // Farmer data
         $farmer = [
-            'id'          => $id,
+            'id' => $id,
+            'name' => $name,
             'phone' => null,
             'phone_verified' => false,
-            'email'       => $email,
+            'email' => $email,
             'email_verified' => true,
-            'google_id'  => $googleId,
-            'online'      => true,
-            'status'      => 'active',
-            'created_at'  => now()->toIso8601String(),
+            'google_id' => $googleId,
+            'online' => true,
+            'status' => 'active',
+            'created_at' => now()->toIso8601String(),
         ];
 
         // Save farmer
         $database
-            ->getReference('farmers/' . $id)
+            ->getReference('farmers/'.$id)
             ->set($farmer);
 
         return $id;
     }
 
+    // public function create(array $data)
+    // {
+    //     $database = $this->firebase->database();
+
+    //     // Check if phone already exists
+    //     $farmers = $database
+    //         ->getReference('farmers')
+    //         ->getValue();
+
+    //     if (!empty($farmers)) {
+    //         foreach ($farmers as $farmer) {
+    //             if (($farmer['phone'] ?? '') === $data['phone']) {
+    //                 return null;
+    //             }
+    //         }
+    //     }
+
+    //     // Get next ID
+    //     $counter = $database
+    //         ->getReference('farmer_counter')
+    //         ->getValue();
+
+    //     $counter = ($counter ?? 0) + 1;
+
+    //     // Save counter
+    //     $database
+    //         ->getReference('farmer_counter')
+    //         ->set($counter);
+
+    //     // Create farmer ID
+    //     $id = 'farmer_' . str_pad($counter, 3, '0', STR_PAD_LEFT);
+
+    //     // Farmer data
+    //     $farmer = [
+    //         'id'          => $id,
+    //         'name'        => $data['name'],
+    //         'phone'       => $data['phone'],
+    //         'language'    => $data['language'],
+    //         'created_at'  => now()->toIso8601String(),
+    //         'online'      => false,
+    //         'platform'    => $data['platform'],
+    //         'status'      => 'active',
+    //         'last_login'  => null,
+    //         'last_logout' => null,
+    //     ];
+
+    //     // Save farmer
+    //     $database
+    //         ->getReference('farmers/' . $id)
+    //         ->set($farmer);
+
+    //     return $farmer;
+    // }
+
     public function update(string $id, array $data)
     {
-        return $this->firebase->database()->getReference('farmers/' . $id)->update($data);
+        return $this->firebase->database()->getReference('farmers/'.$id)->update($data);
     }
 
     public function destroy(string $farmerId)
     {
-        $this->firebase->database()->getReference('farmers/' . $farmerId)->remove();
+        $this->firebase->database()->getReference('farmers/'.$farmerId)->remove();
     }
 
     public function findByPhone(string $phone)
@@ -136,11 +165,11 @@ class FarmerService
             ->equalTo($phone)
             ->getValue();
 
-        if (!$farmers) {
+        if (! $farmers) {
             return null;
         }
 
-        //Checking if account is being deleted
+        // Checking if account is being deleted
         if (($farmer['status'] ?? 'active') === 'deleted') {
             return null;
         }
@@ -158,11 +187,11 @@ class FarmerService
             ->equalTo($email)
             ->getValue();
 
-        if (!$farmers) {
+        if (! $farmers) {
             return null;
         }
 
-        //Checking if account is being deleted
+        // Checking if account is being deleted
         if (($farmer['status'] ?? 'active') === 'deleted') {
             return null;
         }
@@ -180,11 +209,11 @@ class FarmerService
             ->equalTo($googleId)
             ->getValue();
 
-        if (!$farmers) {
+        if (! $farmers) {
             return null;
         }
 
-        //Checking if account is being deleted
+        // Checking if account is being deleted
         if (($farmer['status'] ?? 'active') === 'deleted') {
             return null;
         }
@@ -268,11 +297,45 @@ class FarmerService
             ]);
     }
 
+    // public function updateAuthProvider(string $farmerId, string $authProvider): void
+    // {
+    //     $this->firebase
+    //         ->database()
+    //         ->getReference("farmers/{$farmerId}")
+    //         ->update([
+    //             'auth_provider' => $authProvider,
+    //             'updated_at' => now()->toIso8601String(),
+    //         ]);
+    // }
+
     public function getLocation(string $farmerID)
     {
         return $this->firebase
             ->database()
             ->getReference("farmers/{$farmerID}/location")
             ->getValue();
+    }
+
+    public function getFarmerLanguage(string $farmerId): string
+    {
+        $language = $this->firebase
+            ->database()
+            ->getReference("farmers/{$farmerId}/language")
+            ->getValue();
+
+        return $language === 'hi' ? 'hi' : 'en';
+    }
+
+    public function getFarmerCount()
+    {
+        $totalActiveUsers = $this->firebase
+            ->database()
+            ->getReference('farmers')
+            ->orderByChild('status')
+            ->equalTo('active')
+            ->getSnapshot()
+            ->numChildren();
+
+        return $totalActiveUsers;
     }
 }

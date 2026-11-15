@@ -19,6 +19,8 @@
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
+/storage/app/firebase/
+/storage/app/credentials/
 /storage/*.key
 /storage/pail
 /vendor
@@ -26,3 +28,4 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/tests

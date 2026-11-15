@@ -17,7 +17,7 @@ class FirebaseFarmerUserProvider implements UserProvider
     {
         $farmer = $this->farmers->show($identifier);
 
-        if (!$farmer) {
+        if (! $farmer) {
             return null;
         }
 
@@ -42,7 +42,7 @@ class FirebaseFarmerUserProvider implements UserProvider
 
     public function retrieveByCredentials(array $credentials)
     {
-        if (!isset($credentials['phone'])) {
+        if (! isset($credentials['phone'])) {
             return null;
         }
 
@@ -50,7 +50,7 @@ class FirebaseFarmerUserProvider implements UserProvider
             $credentials['phone']
         );
 
-        if (!$farmer) {
+        if (! $farmer) {
             return null;
         }
 

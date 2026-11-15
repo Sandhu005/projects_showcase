@@ -9,18 +9,22 @@
         <div class="container-fluid px-3 px-lg-4 py-4">
             <div class="page-heading">
                 <div class="page-heading-copy">
-                    <span class="page-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
+                    <span class="page-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
                     <div>
                         <p class="eyebrow mb-1">Management</p>
                         <h1 class="h3 mb-1">Users List</h1>
-                        <p class="text-muted mb-0">Monitor performance, sales, users, and support from one clean workspace.
+                        <p class="text-muted mb-0">Admin panel users in the system.
                         </p>
                     </div>
                 </div>
-                <div class="heading-actions"><button class="btn btn-outline-secondary btn-sm" type="button"><i
-                            class="bi bi-download" aria-hidden="true"></i> Export</button><button
-                        class="btn btn-primary btn-sm" type="button"><i class="bi bi-file-earmark-plus"
-                            aria-hidden="true"></i> Create Report</button>
+                <div class="heading-actions">
+                    {{-- <button class="btn btn-outline-secondary btn-sm" type="button"><i class="bi bi-download"
+                            aria-hidden="true"></i> Export
+                    </button> --}}
+                    @can('manage users')
+                        <a class="btn btn-primary btn-sm" href="{{ route('users.create') }}"><i class="bi bi-person-plus"
+                                aria-hidden="true"></i> Add User</a>
+                    @endcan
                 </div>
             </div>
 
@@ -41,14 +45,15 @@
             <section class="panel mt-3">
                 <div class="panel-header">
                     <div>
-                        <h2 class="h5 mb-1 section-title"><i class="bi bi-people" aria-hidden="true"></i><span>Recent
+                        <h2 class="h5 mb-1 section-title"><i class="bi bi-people" aria-hidden="true"></i><span>All
                                 Users</span></h2>
-                        <p class="text-muted mb-0">Latest account activity across the workspace.</p>
+                        <p class="text-muted mb-0">All account activity across the admin panel.</p>
                     </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="{{route('users.index')}}">Manage Users</a>
+                    <input class="form-control form-control-sm table-search" type="search" placeholder="Search User"
+                        data-table-search="usersTable" aria-label="Search User">
                 </div>
                 <div class="table-responsive">
-                    <table class="table align-middle mb-0">
+                    <table class="table align-middle" mb-0 id="usersTable" data-searchable-table>
                         <thead>
                             <tr>
                                 <th scope="col">Name</th>
@@ -83,21 +88,21 @@
                                                 class="bi bi-eye"></i></a>
 
                                         @can('manage users')
-                                        @if($data->status == 'active')
-                                        <form action="{{ route('users.destroy', $data->id) }}" method="post">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-light btn-sm ms-1" type="submit"><i
-                                                    class="bi bi-trash3"></i></button>
-                                        </form>
-                                        @else
-                                            <form action="{{ route('users.restore', $data->id) }}" method="post">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button class="btn btn-light btn-sm ms-1" type="submit"><i
-                                                    class="bi bi-arrow-clockwise"></i></button>
-                                        </form>
-                                        @endif
+                                            @if (!$data->trashed())
+                                                <form action="{{ route('users.destroy', $data->id) }}" method="post">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="btn btn-light btn-sm ms-1" type="submit"><i
+                                                            class="bi bi-trash3"></i></button>
+                                                </form>
+                                            @else
+                                                <form action="{{ route('users.restore', $data->id) }}" method="post">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button class="btn btn-light btn-sm ms-1" type="submit"><i
+                                                            class="bi bi-arrow-clockwise"></i></button>
+                                                </form>
+                                            @endif
                                         @endcan
                                     </td>
                                 </tr>

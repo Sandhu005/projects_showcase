@@ -2,78 +2,170 @@
 
 namespace App\Services;
 
+use App\Models\Station;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class WeatherService
 {
-    private string $stationsUrl = '';
+    private string $predictionBaseUrl =
+        'https://lotusinfotech.co.in/uhfnew/data/predictions/';
 
-    private string $predictionBaseUrl = '';
-
-    private string $gddUrl = '';
-
+    private string $gddUrl =
+        'https://lotusinfotech.co.in/uhfnew/data/daily_gdd_data.json';
 
     /**
-     * Get weather data for a latitude/longitude.
+     * Get weather data for latitude/longitude.
+     * Used by mobile API.
      */
     public function getWeatherData(
         float $latitude,
         float $longitude
     ): ?array {
 
-        // Find nearest station within 50 KM
+        $latitude = round($latitude, 2);
+        $longitude = round($longitude, 2);
+
+        $cacheKey = 'weather:'.$latitude.':'.$longitude;
+
+        $cachedWeather = Cache::get($cacheKey);
+
+        if ($cachedWeather !== null) {
+            return $cachedWeather;
+        }
+
         $nearest = $this->getNearestStation(
             $latitude,
             $longitude
         );
 
-        if (!$nearest) {
+        if (! $nearest) {
             return null;
         }
 
         $station = $nearest['station'];
 
-        // Station ID
-        $stationID = strtolower($station['id']);
+        $stationId = strtolower($station->station_id);
 
-        // Prediction URL
-        $url = $this->predictionBaseUrl . $stationID . '.json';
+        $weather = $this->getWeatherByStation($stationId);
 
-        $response = Http::timeout(10)->get($url);
-
-        if (!$response->successful()) {
+        if (! $weather) {
             return null;
         }
 
-        return [
-            'station' => $station,
-            'station_id' => $stationID,
+        $image = $this->getWeatherImage($weather);
+
+        $data = [
+            'station' => $station->name,
+            'station_id' => $stationId,
             'distance_km' => $nearest['distance_km'],
-            'weather' => $response->json(),
+            'image' => $image,
+            'weather_data' => $weather,
         ];
+
+        Cache::put(
+            $cacheKey,
+            $data,
+            now()->addMinutes(30)
+        );
+
+        return $data;
     }
 
+    /**
+     * Get weather data by station/location.
+     * Used by admin panel.
+     */
+    public function getWeatherByLocation(string $location): ?array
+    {
+        $location = strtolower($location);
+
+        $cacheKey = 'weather:location:'.$location;
+
+        $cachedWeather = Cache::get($cacheKey);
+
+        if ($cachedWeather !== null) {
+            return $cachedWeather;
+        }
+
+        $weather = $this->getWeatherByStation($location);
+
+        if (! $weather) {
+            return null;
+        }
+
+        Cache::put(
+            $cacheKey,
+            $weather,
+            now()->addMinutes(30)
+        );
+
+        return $weather;
+    }
 
     /**
-     * Get GDD data for a particular station.
+     * Get weather prediction from external API.
      */
-    public function getGddData(string $stationId): ?array
+    private function getWeatherByStation(string $stationId): ?array
     {
-        $response = Http::timeout(10)->get($this->gddUrl);
+        $stationId = strtolower($stationId);
 
-        if (!$response->successful()) {
+        $url = $this->predictionBaseUrl.$stationId.'.json';
+
+        $response = Http::timeout(10)->get($url);
+
+        if (! $response->successful()) {
             return null;
         }
 
         $data = $response->json();
 
-        if (!is_array($data)) {
+        return $data['predictions'] ?? null;
+    }
+
+    /**
+     * Get GDD data for a station.
+     */
+    public function getGddData(string $stationId): ?array
+    {
+        $stationId = strtolower($stationId);
+
+        // Cache the entire GDD dataset.
+        $cacheKey = 'gdd:all';
+
+        $data = Cache::get($cacheKey);
+
+        if ($data === null) {
+            $response = Http::timeout(10)->get($this->gddUrl);
+
+            if (! $response->successful()) {
+                return null;
+            }
+
+            $data = $response->json();
+
+            if (! is_array($data)) {
+                return null;
+            }
+
+            Cache::put(
+                $cacheKey,
+                $data,
+                now()->addMinutes(30)
+            );
+        }
+
+        $stationData = $data[$stationId] ?? null;
+
+        if (! is_array($stationData)) {
             return null;
         }
 
-        return $data[$stationId] ?? null;
-    }
+        // Sort records by date: today -> future dates
+        $stationData['records'] = array_reverse($stationData['records']);
 
+        return $stationData;
+    }
 
     /**
      * Find nearest station within 50 KM.
@@ -83,17 +175,12 @@ class WeatherService
         float $longitude
     ): ?array {
 
-        $response = Http::timeout(10)->get(
-            $this->stationsUrl
-        );
+        $stations = Station::where([
+            ['status', true],
+            ['state', 'Himachal Pradesh'],
+        ])->get();
 
-        if (!$response->successful()) {
-            return null;
-        }
-
-        $stations = $response->json();
-
-        if (!is_array($stations)) {
+        if ($stations->isEmpty()) {
             return null;
         }
 
@@ -102,21 +189,11 @@ class WeatherService
 
         foreach ($stations as $station) {
 
-            if (
-                !isset($station['latitude']) ||
-                !isset($station['longitude'])
-            ) {
-                continue;
-            }
-
-            $stationLatitude = (float) $station['latitude'];
-            $stationLongitude = (float) $station['longitude'];
-
             $distance = $this->calculateDistance(
                 $latitude,
                 $longitude,
-                $stationLatitude,
-                $stationLongitude
+                (float) $station->latitude,
+                (float) $station->longitude
             );
 
             if ($distance < $nearestDistance) {
@@ -125,12 +202,7 @@ class WeatherService
             }
         }
 
-        if (!$nearestStation) {
-            return null;
-        }
-
-        // More than 50 KM
-        if ($nearestDistance > 50) {
+        if (! $nearestStation || $nearestDistance > 50) {
             return null;
         }
 
@@ -139,7 +211,6 @@ class WeatherService
             'distance_km' => round($nearestDistance, 2),
         ];
     }
-
 
     /**
      * Calculate distance between two coordinates.
@@ -168,5 +239,21 @@ class WeatherService
         );
 
         return $earthRadius * $c;
+    }
+
+    public function getWeatherImage(array $weather): string
+    {
+        $tp = $weather['variables']['tp'] ?? 0;
+        $tcc = $weather['variables']['tcc'] ?? 0;
+
+        if ($tp > 0.1) {
+            return 'images/weather/rainy.jpg';
+        } elseif ($tcc >= 0.75) {
+            return 'images/weather/cloudy.jpg';
+        } elseif ($tcc >= 0.5) {
+            return 'images/weather/partial-cloudy.jpg';
+        } else {
+            return 'images/weather/sunny.jpg';
+        }
     }
 }
